@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Waste Management Check-in Wizard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-r from-green-400 to-blue-500">
+    <div id="app" class="max-w-4xl mx-auto my-10 bg-white bg-opacity-90 rounded-xl shadow-2xl overflow-hidden">
+        <div class="p-8">
+            <h1 class="text-4xl font-bold mb-6 text-center text-green-800">Waste Management Check-in Wizard</h1>
+            <div id="wizardSteps" class="space-y-6">
+                <!-- Step 1: Basic Information -->
+                <div id="step1" class="step bg-green-100 p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-bold mb-4 text-green-800"><i class="fas fa-info-circle mr-2"></i>Step 1: Basic Information</h2>
+                    <input type="text" id="location" placeholder="Location Name" class="w-full p-2 mb-4 border rounded focus:ring-2 focus:ring-green-400">
+                    <input type="date" id="date" class="w-full p-2 mb-4 border rounded focus:ring-2 focus:ring-green-400">
+                </div>
+
+                <!-- Step 2: Waste Characterization -->
+                <div id="step2" class="step hidden bg-blue-100 p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-bold mb-4 text-blue-800"><i class="fas fa-trash-alt mr-2"></i>Step 2: Waste Characterization</h2>
+                    <input type="number" id="volume" placeholder="Volume (in cubic meters)" class="w-full p-2 mb-4 border rounded focus:ring-2 focus:ring-blue-400">
+                    <select id="wasteType" class="w-full p-2 mb-4 border rounded focus:ring-2 focus:ring-blue-400">
+                        <option value="">Select Waste Type</option>
+                        <option value="organic">Organic</option>
+                        <option value="plastic">Plastic</option>
+                        <option value="metal">Metal</option>
+                        <option value="paper">Paper</option>
+                        <option value="electronic">Electronic</option>
+                        <option value="hazardous">Hazardous</option>
+                    </select>
+                    <textarea id="description" placeholder="Detailed description of waste" class="w-full p-2 mb-4 border rounded focus:ring-2 focus:ring-blue-400" rows="4"></textarea>
+                </div>
+
+                <!-- Step 3: Environmental Impact -->
+                <div id="step3" class="step hidden bg-teal-100 p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-bold mb-4 text-teal-800"><i class="fas fa-leaf mr-2"></i>Step 3: Environmental Impact</h2>
+                    <select id="burnFrequency" class="w-full p-2 mb-4 border rounded focus:ring-2 focus:ring-teal-400">
+                        <option value="">Frequency of Burning</option>
+                        <option value="never">Never</option>
+                        <option value="rarely">Rarely</option>
+                        <option value="sometimes">Sometimes</option>
+                        <option value="often">Often</option>
+                        <option value="always">Always</option>
+                    </select>
+                    <select id="runoffRisk" class="w-full p-2 mb-4 border rounded focus:ring-2 focus:ring-teal-400">
+                        <option value="">Risk of Runoff</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                    <input type="text" id="animalImpact" placeholder="Animals affected (comma-separated)" class="w-full p-2 mb-4 border rounded focus:ring-2 focus:ring-teal-400">
+                    <input type="text" id="toxics" placeholder="Toxic materials present (if any)" class="w-full p-2 mb-4 border rounded focus:ring-2 focus:ring-teal-400">
+                </div>
+
+                <!-- Step 4: Resource Mapping -->
+                <div id="step4" class="step hidden bg-indigo-100 p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-bold mb-4 text-indigo-800"><i class="fas fa-map-marked-alt mr-2"></i>Step 4: Resource Mapping</h2>
+                    <input type="file" id="resourceImage" accept="image/*" class="w-full p-2 mb-4 border rounded focus:ring-2 focus:ring-indigo-400">
+                    <div id="imagePreview" class="mb-4"></div>
+                    <div id="map" style="height: 300px;" class="mb-4 rounded-lg shadow-md"></div>
+                    <input type="text" id="latitude" placeholder="Latitude" class="w-full p-2 mb-2 border rounded focus:ring-2 focus:ring-indigo-400" readonly>
+                    <input type="text" id="longitude" placeholder="Longitude" class="w-full p-2 mb-4 border rounded focus:ring-2 focus:ring-indigo-400" readonly>
+                </div>
+
+                <!-- Step 5: NFT Creation -->
+\
+                <div id="step5" class="step hidden bg-purple-100 p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-bold mb-4 text-purple-800"><i class="fas fa-cube mr-2"></i>Step 5: NFT Creation</h2>
+                    <p class="mb-4 text-purple-700">Your waste management check-in data will be used to create an NFT.</p>
+                    <input type="text" id="nftName" placeholder="NFT Name" class="w-full p-2 mb-4 border rounded focus:ring-2 focus:ring-purple-400">
+                    <textarea id="nftDescription" placeholder="NFT Description" class="w-full p-2 mb-4 border rounded focus:ring-2 focus:ring-purple-400" rows="4"></textarea>
+                    <div id="nftArtDisplay" class="mt-4"></div> <!-- New div for NFT art display -->
+                             
+                </div>
+            </div>
+
+            <div class="flex justify-between mt-6">
+                <button id="prevBtn" class="bg-gray-500 text-white px-6 py-2 rounded-full hover:bg-gray-600 transition duration-300 ease-in-out transform hover:scale-105"><i class="fas fa-arrow-left mr-2"></i>Previous</button>
+                <button id="nextBtn" class="bg-blue-500 text-white px-6 py-2 rounded-full hover:bg-blue-600 transition duration-300 ease-in-out transform hover:scale-105">Next<i class="fas fa-arrow-right ml-2"></i></button>
+                <button id="submitBtn" class="bg-green-500 text-white px-6 py-2 rounded-full hover:bg-green-600 transition duration-300 ease-in-out transform hover:scale-105 hidden"><i class="fas fa-check mr-2"></i>Submit</button>
+            </div>
+
+            <div class="mt-6 flex justify-center space-x-4">
+                <button id="voiceBtn" class="bg-yellow-500 text-white px-4 py-2 rounded-full hover:bg-yellow-600 transition duration-300 ease-in-out transform hover:scale-105"><i class="fas fa-volume-up mr-2"></i>Read Aloud</button>
+                <button id="aiHelpBtn" class="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600 transition duration-300 ease-in-out transform hover:scale-105"><i class="fas fa-robot mr-2"></i>AI Assistance</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+        let map, marker;
+        let checkInData = {};
+
+        function showStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`step${step}`).classList.remove('hidden');
+            document.getElementById('prevBtn').style.display = step === 1 ? 'none' : 'block';
+            document.getElementById('nextBtn').style.display = step === totalSteps ? 'none' : 'block';
+            document.getElementById('submitBtn').style.display = step === totalSteps ? 'block' : 'none';
+        }
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+                if (currentStep === 4) initMap();
+            }
+        });
+
+        document.getElementById('submitBtn').addEventListener('click', submitCheckIn);
+
+        document.getElementById('resourceImage').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imagePreview').innerHTML = `<img src="${e.target.result}" class="max-w-full h-auto rounded-lg shadow-md" />`;
+                    checkInData.resourceImage = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+
+
+
+
+function generateNFTArt(data) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", "300");
+    svg.setAttribute("height", "300");
+    svg.setAttribute("viewBox", "0 0 100 100");
+
+    // Background
+    const background = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    background.setAttribute("width", "100");
+    background.setAttribute("height", "100");
+    background.setAttribute("fill", `hsl(${Math.random() * 360}, 70%, 80%)`);
+    svg.appendChild(background);
+
+    // Waste representation
+    const wasteCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    wasteCircle.setAttribute("cx", "50");
+    wasteCircle.setAttribute("cy", "50");
+    wasteCircle.setAttribute("r", Math.min(40, Math.max(10, data.volume))); // Size based on volume
+    wasteCircle.setAttribute("fill", getWasteColor(data.wasteType));
+    svg.appendChild(wasteCircle);
+
+    // Environmental impact representation
+    const impactLines = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    const lineCount = getImpactLineCount(data.burnFrequency, data.runoffRisk);
+    for (let i = 0; i < lineCount; i++) {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        const angle = (i / lineCount) * Math.PI * 2;
+        line.setAttribute("x1", 50 + Math.cos(angle) * 45);
+        line.setAttribute("y1", 50 + Math.sin(angle) * 45);
+        line.setAttribute("x2", 50 + Math.cos(angle) * 50);
+        line.setAttribute("y2", 50 + Math.sin(angle) * 50);
+        line.setAttribute("stroke", "rgba(255, 0, 0, 0.5)");
+        line.setAttribute("stroke-width", "0.5");
+        impactLines.appendChild(line);
+    }
+    svg.appendChild(impactLines);
+
+    // Location representation
+    const locationDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    locationDot.setAttribute("cx", data.longitude % 100);
+    locationDot.setAttribute("cy", data.latitude % 100);
+    locationDot.setAttribute("r", "2");
+    locationDot.setAttribute("fill", "blue");
+    svg.appendChild(locationDot);
+
+    // Add text
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", "50");
+    text.setAttribute("y", "95");
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("font-size", "4");
+    text.setAttribute("fill", "black");
+    text.textContent = data.location;
+    svg.appendChild(text);
+
+    return svg.outerHTML;
+}
+
+function getWasteColor(wasteType) {
+    const colors = {
+        organic: "green",
+        plastic: "yellow",
+        metal: "gray",
+        paper: "brown",
+        electronic: "purple",
+        hazardous: "red"
+    };
+    return colors[wasteType] || "black";
+}
+
+function getImpactLineCount(burnFrequency, runoffRisk) {
+    const burnScore = {"never": 0, "rarely": 1, "sometimes": 2, "often": 3, "always": 4}[burnFrequency] || 0;
+    const runoffScore = {"low": 1, "medium": 2, "high": 3}[runoffRisk] || 0;
+    return burnScore + runoffScore;
+}
+
+
+
+
+      
+        function initMap() {
+            if (!map) {
+                map = L.map('map').setView([0, 0], 2);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+
+                map.on('click', function(e) {
+                    if (marker) map.removeLayer(marker);
+                    marker = L.marker(e.latlng).addTo(map);
+                    document.getElementById('latitude').value = e.latlng.lat.toFixed(6);
+                    document.getElementById('longitude').value = e.latlng.lng.toFixed(6);
+                });
+            }
+        }
+
+
+
+// Update the submitCheckIn function to include NFT art generation
+function submitCheckIn() {
+    // ... (existing code)
+
+
+
+
+
+      
+        function submitCheckIn() {
+            // Gather all the data
+            checkInData = {
+                location: document.getElementById('location').value,
+                date: document.getElementById('date').value,
+                volume: document.getElementById('volume').value,
+                wasteType: document.getElementById('wasteType').value,
+                description: document.getElementById('description').value,
+                burnFrequency: document.getElementById('burnFrequency').value,
+                runoffRisk: document.getElementById('runoffRisk').value,
+                animalImpact: document.getElementById('animalImpact').value,
+                toxics: document.getElementById('toxics').value,
+                latitude: document.getElementById('latitude').value,
+                longitude: document.getElementById('longitude').value,
+                nftName: document.getElementById('nftName').value,
+                nftDescription: document.getElementById('nftDescription').value,
+                ...checkInData // This includes the resourceImage
+            };
+
+            console.log("Check-in data:", checkInData);
+            alert(`NFT created for check-in at ${checkInData.location}!`);
+            alert(`Check-in point added to OpenStreetMap at ${checkInData.latitude}, ${checkInData.longitude}`);
+
+            // Reset the form
+            currentStep = 1;
+            showStep(currentStep);
+            document.querySelectorAll('input, select, textarea').forEach(el => el.value = '');
+            document.getElementById('imagePreview').innerHTML = '';
+            if (marker) map.removeLayer(marker);
+        
+            // Generate NFT art
+            const nftArt = generateNFTArt(checkInData);
+            
+            // Display the generated NFT art
+            const nftArtDisplay = document.createElement('div');
+            nftArtDisplay.innerHTML = nftArt;
+            nftArtDisplay.className = 'mt-4';
+            document.getElementById('step5').appendChild(nftArtDisplay);
+
+
+
+          
+        }
+
+        // Voice narration
+        document.getElementById('voiceBtn').addEventListener('click', () => {
+            const currentStepContent = document.querySelector(`.step:not(.hidden)`).textContent;
+            const utterance = new SpeechSynthesisUtterance(currentStepContent);
+            speechSynthesis.speak(utterance);
+        });
+
+        // AI Assistance (simulated)
+        document.getElementById('aiHelpBtn').addEventListener('click', () => {
+            const aiResponses = [
+                "Try to be as specific as possible when describing the waste.",
+                "Don't forget to check for any hazardous materials.",
+                "Consider the long-term environmental impact of the waste site.",
+                "Accurate location data is crucial for effective waste management.",
+                "Your NFT will help track and incentivize waste management efforts."
+            ];
+            const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+            alert(`AI Assistant says: ${randomResponse}`);
+        });
+
+        // Initialize
+        showStep(currentStep);
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+// Add this function to your existing JavaScript code
+
+function generateNFTArt(data) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", "300");
+    svg.setAttribute("height", "300");
+    svg.setAttribute("viewBox", "0 0 100 100");
+
+    // Background
+    const background = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    background.setAttribute("width", "100");
+    background.setAttribute("height", "100");
+    background.setAttribute("fill", `hsl(${Math.random() * 360}, 70%, 80%)`);
+    svg.appendChild(background);
+
+    // Waste representation
+    const wasteCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    wasteCircle.setAttribute("cx", "50");
+    wasteCircle.setAttribute("cy", "50");
+    wasteCircle.setAttribute("r", Math.min(40, Math.max(10, data.volume))); // Size based on volume
+    wasteCircle.setAttribute("fill", getWasteColor(data.wasteType));
+    svg.appendChild(wasteCircle);
+
+    // Environmental impact representation
+    const impactLines = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    const lineCount = getImpactLineCount(data.burnFrequency, data.runoffRisk);
+    for (let i = 0; i < lineCount; i++) {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        const angle = (i / lineCount) * Math.PI * 2;
+        line.setAttribute("x1", 50 + Math.cos(angle) * 45);
+        line.setAttribute("y1", 50 + Math.sin(angle) * 45);
+        line.setAttribute("x2", 50 + Math.cos(angle) * 50);
+        line.setAttribute("y2", 50 + Math.sin(angle) * 50);
+        line.setAttribute("stroke", "rgba(255, 0, 0, 0.5)");
+        line.setAttribute("stroke-width", "0.5");
+        impactLines.appendChild(line);
+    }
+    svg.appendChild(impactLines);
+
+    // Location representation
+    const locationDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    locationDot.setAttribute("cx", data.longitude % 100);
+    locationDot.setAttribute("cy", data.latitude % 100);
+    locationDot.setAttribute("r", "2");
+    locationDot.setAttribute("fill", "blue");
+    svg.appendChild(locationDot);
+
+    // Add text
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", "50");
+    text.setAttribute("y", "95");
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("font-size", "4");
+    text.setAttribute("fill", "black");
+    text.textContent = data.location;
+    svg.appendChild(text);
+
+    return svg.outerHTML;
+}
+
+function getWasteColor(wasteType) {
+    const colors = {
+        organic: "green",
+        plastic: "yellow",
+        metal: "gray",
+        paper: "brown",
+        electronic: "purple",
+        hazardous: "red"
+    };
+    return colors[wasteType] || "black";
+}
+
+function getImpactLineCount(burnFrequency, runoffRisk) {
+    const burnScore = {"never": 0, "rarely": 1, "sometimes": 2, "often": 3, "always": 4}[burnFrequency] || 0;
+    const runoffScore = {"low": 1, "medium": 2, "high": 3}[runoffRisk] || 0;
+    return burnScore + runoffScore;
+}
+
+// Update the submitCheckIn function to include NFT art generation
+function submitCheckIn() {
+    // ... (existing code)
+
+    // Generate NFT art
+    const nftArt = generateNFTArt(checkInData);
+    
+    // Display the generated NFT art
+    const nftArtDisplay = document.createElement('div');
+    nftArtDisplay.innerHTML = nftArt;
+    nftArtDisplay.className = 'mt-4';
+    document.getElementById('step5').appendChild(nftArtDisplay);
+
+    // ... (rest of the existing code)
+}
