@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoOps NFT Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.5.2/web3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+</head>
+<body class="bg-green-50">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-green-800 mb-8">EcoOps NFT Login</h1>
+        <div id="loginContainer" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <button id="connectWallet" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-4">
+                Connect Wallet
+            </button>
+            <button id="createWallet" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-4">
+                Create New Wallet
+            </button>
+            <p id="accountInfo" class="mt-4 text-gray-700"></p>
+            <p id="roleInfo" class="mt-2 text-gray-700 font-bold"></p>
+            <div id="checkInContainer" class="mt-4 hidden">
+                <h2 class="text-2xl font-bold mb-4">Check-In</h2>
+                <select id="checkInType" class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
+                    <option value="0">Water Quality Improvement</option>
+                    <option value="1">Biodiversity</option>
+                    <option value="2">Climate Resiliency</option>
+                    <option value="3">Sustainable Food Systems</option>
+                    <option value="4">Circular Economy Development</option>
+                    <option value="5">Detoxification</option>
+                    <option value="6">Transparency Process</option>
+                    <option value="7">Certification / Training Quiz</option>
+                </select>
+                <button id="checkIn" class="mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Check In
+                </button>
+            </div>
+            <div id="poapContainer" class="mt-4 hidden">
+                <h2 class="text-2xl font-bold mb-4">POAP</h2>
+                <p id="poapStatus"></p>
+                <button id="mintPOAP" class="mt-4 bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Mint POAP
+                </button>
+            </div>
+            <div id="newWalletInfo" class="mt-4 p-4 bg-yellow-100 rounded hidden">
+                <!-- ... (Keep the existing new wallet info section) ... -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const contractAddress = '0x...'; // Replace with your deployed contract address on Celo testnet
+        const contractABI = []; // Replace with your contract ABI
+
+        let web3;
+        let contract;
+        let account;
+
+        const connectWallet = async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    web3 = new Web3(window.ethereum);
+                    const accounts = await web3.eth.getAccounts();
+                    account = accounts[0];
+                    document.getElementById('accountInfo').textContent = `Connected: ${account}`;
+                    contract = new web3.eth.Contract(contractABI, contractAddress);
+                    checkUserRole();
+                    checkPOAPStatus();
+                } catch (error) {
+                    console.error("User denied account access");
+                }
+            } else {
+                alert('Please install MetaMask or create a new wallet.');
+            }
+        };
+
+        const createWallet = async () => {
+            const wallet = ethers.Wallet.createRandom();
+            account = wallet.address;
+            document.getElementById('accountInfo').textContent = `New Wallet Created: ${account}`;
+            document.getElementById('walletAddress').textContent = `Address: ${account}`;
+            document.getElementById('walletPhrase').textContent = wallet.mnemonic.phrase;
+            document.getElementById('newWalletInfo').classList.remove('hidden');
+            // Note: In a real application, you would need to handle connecting this new wallet to your dApp
+            // and possibly funding it with some testnet CELO for gas fees.
+        };
+
+
+
+        const checkUserRole = async () => {
+            const roles = ['Project Partner', 'Assistant', 'Periodic Volunteer', 'EcoCity Admin', 'WorldBridger Coordinator', 'Exotopia Contributor'];
+            for (let i = 0; i < roles.length; i++) {
+                const hasRole = await contract.methods.hasRole(account, i).call();
+                if (hasRole) {
+                    document.getElementById('roleInfo').textContent = `Role: ${roles[i]}`;
+                    if (i === 0 || i === 2) { // Project Partner or Periodic Volunteer
+                        document.getElementById('checkInContainer').classList.remove('hidden');
+                    }
+                    return;
+                }
+            }
+            document.getElementById('roleInfo').textContent = 'No role found';
+        };
+
+        const checkIn = async () => {
+            const checkInType = document.getElementById('checkInType').value;
+            try {
+                await contract.methods.checkIn(checkInType).send({ from: account });
+                alert('Check-in successful!');
+            } catch (error) {
+                console.error('Check-in failed:', error);
+                alert('Check-in failed. See console for details.');
+            }
+        };
+
+        const checkPOAPStatus = async () => {
+            const hasPOAP = await contract.methods.hasPOAP(account).call();
+            document.getElementById('poapContainer').classList.remove('hidden');
+            if (hasPOAP) {
+                document.getElementById('poapStatus').textContent = 'You have a POAP!';
+                document.getElementById('mintPOAP').classList.add('hidden');
+            } else {
+                document.getElementById('poapStatus').textContent = 'You don\'t have a POAP yet.';
+            }
+        };
+
+        const mintPOAP = async () => {
+            try {
+                await contract.methods.mintPOAP(account).send({ from: account });
+                alert('POAP minted successfully!');
+                checkPOAPStatus();
+            } catch (error) {
+                console.error('POAP minting failed:', error);
+                alert('POAP minting failed. See console for details.');
+            }
+        };
+
+        document.getElementById('connectWallet').addEventListener('click', connectWallet);
+        document.getElementById('createWallet').addEventListener('click', createWallet);
+        document.getElementById('checkIn').addEventListener('click', checkIn);
+        document.getElementById('mintPOAP').addEventListener('click', mintPOAP);
+
+        // Check if wallet is already connected
+        if (typeof window.ethereum !== 'undefined') {
+            window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
+                if (accounts.length > 0) {
+                    connectWallet();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
