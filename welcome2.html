@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WorldBridger One</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/heroicons@2.0.13/build/heroicons.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* ... (previous styles) ... */
+
+    /* Add styles for SVG animation */
+    .rotating-globe {
+      animation: rotateGlobe 20s linear infinite;
+    }
+
+    @keyframes rotateGlobe {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .pulsating-icon {
+      animation: pulsate 2s ease-in-out infinite;
+    }
+
+    @keyframes pulsate {
+      0% {
+        transform: scale(1);
+        opacity: 0.7;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0.7;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+
+  <header class="py-6 px-4 bg-blue-500 text-white">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-3xl font-bold">WorldBridger One</h1>
+      <button class="bg-white text-blue-500 px-4 py-2 rounded-md hover:bg-blue-100">
+        Login <i class="fa-solid fa-circle-info ml-2 text-blue-500" data-tippy-content="Log in with your existing account or create a new one to access all features."></i>
+      </button>
+    </div>
+  </header>
+
+  <section class="container mx-auto py-12 px-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center"> 
+      <div>
+        <h2 class="text-3xl font-bold mb-4">Welcome to WorldBridger One</h2>
+        <p class="text-gray-700 mb-6">Join a global movement connecting communities, promoting environmental awareness, and building a sustainable future - for Earth and beyond.</p>
+
+        <div class="flex flex-wrap gap-4 mb-6">
+          <div class="flex items-center">
+            <svg class="w-6 h-6 text-green-500 mr-2 pulsating-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+            <span>Peace</span>
+          </div>
+          <div class="flex items-center">
+            <svg class="w-6 h-6 text-blue-500 mr-2 pulsating-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+            <span>Transparency</span>
+          </div>
+          <div class="flex items-center">
+            <svg class="w-6 h-6 text-yellow-500 mr-2 pulsating-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>Cooperation</span>
+          </div>
+        </div>
+
+        <button class="mt-4 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg">
+          Explore the World 
+          <svg class="w-5 h-5 ml-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </button>
+      </div>
+      <div>
+        <svg class="w-full h-64 rotating-globe" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="80" fill="#6366f1" /> 
+          <path d="M40 100 L160 100" stroke="white" stroke-width="2" />
+          <path d="M100 40 L100 160" stroke="white" stroke-width="2" />
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="container mx-auto py-12 px-4">
+    <h2 class="text-2xl font-bold mb-4">Choose Your Blockchain <i class="fa-solid fa-circle-info ml-2 text-gray-600" data-tippy-content="Select your preferred blockchain to connect your wallet and mint NFTs."></i></h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <button class="bg-blue-400 hover:bg-blue-500 text-white px-4 py-3 rounded-md rotating-border" data-chain="Ethereum">Ethereum</button>
