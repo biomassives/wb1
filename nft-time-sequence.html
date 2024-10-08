@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WorldBridger One</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/heroicons@2.0.13/build/heroicons.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* ... (previous styles) ... */
+    .calendar-ring {
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      position: relative;
+      overflow: hidden;
+      margin: 50px auto; /* Center the calendar */
+    }
+
+    .calendar-segment {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      clip-path: polygon(50% 50%, 100% 0, 100% 100%);
+      transform-origin: 50% 50%;
+    }
+
+    /* Add colors for each chain (13 colors) */
+    .chain-0 { background-color: #f87171; } /* Red */
+    .chain-1 { background-color: #fb923c; } /* Orange */
+    .chain-2 { background-color: #facc15; } /* Yellow */
+    .chain-3 { background-color: #86efac; } /* Green */
+    .chain-4 { background-color: #22d3ee; } /* Light Blue */
+    .chain-5 { background-color: #6366f1; } /* Blue */
+    .chain-6 { background-color: #a855f7; } /* Purple */
+    .chain-7 { background-color: #ec4899; } /* Pink */
+    .chain-8 { background-color: #f43f5e; } /* Rose */
+    .chain-9 { background-color: #84cc16; } /* Lime */
+    .chain-10 { background-color: #22c55e; } /* Emerald */
+    .chain-11 { background-color: #10b981; } /* Teal */
+    .chain-12 { background-color: #06b6d4; } /* Cyan */
+  </style>
+</head>
+<body class="bg-gray-100">
+  <header class="py-6 px-4 bg-blue-500 text-white">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-3xl font-bold">WorldBridger One</h1>
+      <button class="bg-white text-blue-500 px-4 py-2 rounded-md hover:bg-blue-100">
+        Login <i class="fa-solid fa-circle-info ml-2 text-blue-500" data-tippy-content="Log in with your existing account or create a new one to access all features."></i>
+      </button>
+    </div>
+  </header>
+  <section class="container mx-auto py-12 px-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div>
+        <h2 class="text-2xl font-bold mb-4">Connect. Explore. Protect.</h2>
+        <p class="text-gray-700">Join the WorldBridger One movement and empower communities to build a sustainable future. With WorldBridger One, you can explore a 3D world, participate in eco-challenges, collect POAPs, and contribute to citizen science initiatives. Connect with other users, share your achievements, and make a real-world impact.</p>
+        <button class="mt-6 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg">Download the App <i class="fa-solid fa-circle-info ml-2 text-white" data-tippy-content="Available on iOS and Android. Download links coming soon!"></i></button>
+      </div>
+      <div>
+        <img src="https://via.placeholder.com/500x300" alt="WorldBridger One Image" class="rounded-lg shadow-md">
+      </div>
+    </div>
+  </section>
+  <section class="container mx-auto py-12 px-4">
+    <h2 class="text-2xl font-bold mb-4">Choose Your Blockchain <i class="fa-solid fa-circle-info ml-2 text-gray-600" data-tippy-content="Select your preferred blockchain to connect your wallet and mint NFTs."></i></h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <button class="bg-blue-400 hover:bg-blue-500 text-white px-4 py-3 rounded-md rotating-border" data-chain="Ethereum">Ethereum</button>
+      <button class="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-3 rounded-md rotating-border" data-chain="Celo">Celo</button>
+      <button class="bg-purple-400 hover:bg-purple-500 text-white px-4 py-3 rounded-md rotating-border" data-chain="Polygon">Polygon</button>
+    </div>
+    <div class="mt-8 text-center">
+      <p class="text-gray-600">NFTs are minted every 4 days on a different blockchain in a rotating cycle.</p>
+    </div>
+    <div class="calendar-ring">
+      </div>
+  </section>
+  <footer class="py-4 px-4 bg-gray-800 text-white text-center relative">
+    <div class="globe mx-auto mb-4 relative">
+      <i class="fa-solid fa-satellite icon-1"></i>
+      <i class="fa-solid fa-water icon-2"></i>
+      <i class="fa-solid fa-tree icon-3"></i>
+      <i class="fa-solid fa-recycle icon-4"></i>
+      <div class="connecting-line line-1"></div>
+      <div class="connecting-line line-2"></div>
+      <div class="connecting-line line-3"></div>
+    </div>
+    <p>&copy; 2024 WorldBridger One</p>
+  </footer>
+  <script src="https://kit.fontawesome.com/your-font-awesome-kit-id.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+  <script>
+    // ... (previous scripts) ...
+
+    const calendarRing = document.querySelector('.calendar-ring');
+    const segmentAngle = 360 / 52; // Angle for each 52-day segment
+    const chainCount = 13;
+
+    for (let i = 0; i < 52; i++) {
+      const segment = document.createElement('div');
+      segment.classList.add('calendar-segment', `chain-${i % chainCount}`);
+      segment.style.transform = `rotate(${i * segmentAngle}deg)`;
+      calendarRing.appendChild(segment);
+    }
+
+    tippy('[data-tippy-content]', {
+      theme: 'light', // Optional: Customize the tooltip theme
+      placement: 'top', // Optional: Customize the tooltip position
+    });
+  </script>
+</body>
+</html>
