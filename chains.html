@@ -1,5 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/heroicons@2.0.13/build/heroicons.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* ... (previous styles) ... */
+
+    /* Add styles for SVG animation */
+    .rotating-globe {
+      animation: rotateGlobe 20s linear infinite;
+    }
+
+    @keyframes rotateGlobe {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .pulsating-icon {
+      animation: pulsate 2s ease-in-out infinite;
+    }
+
+    @keyframes pulsate {
+      0% {
+        transform: scale(1);
+        opacity: 0.7;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0.7;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+
+  <header class="py-6 px-4 bg-blue-500 text-white">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-3xl font-bold">WorldBridger One</h1>
+      <button class="bg-white text-blue-500 px-4 py-2 rounded-md hover:bg-blue-100">
+        Login <i class="fa-solid fa-circle-info ml-2 text-blue-500" data-tippy-content="Log in with your existing account or create a new one to access all features."></i>
+      </button>
+    </div>
+  </header>
+
+  
 <body>
   <section class="container mx-auto py-12 px-4">
     <h2 class="text-2xl font-bold mb-4">Choose Your Blockchain <i class="fa-solid fa-circle-info ml-2 text-gray-600" data-tippy-content="Select your preferred blockchain to connect your wallet and mint NFTs."></i></h2>
